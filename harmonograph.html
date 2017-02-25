@@ -1,0 +1,127 @@
+<html>
+<head>
+<script>
+var degrees = Math.PI/180;
+var a1 = 0;
+var a2 = 0;
+var g1 = 200;
+var g2 = 200;
+var frist = 1;
+var i;
+
+var w1 = 0.488;
+var w2 = 1;
+var decay = 1;
+var ph = 90;
+
+function reset(){
+	a1 = 0;
+	a2 = 0;
+	g1 = 200;
+	g2 = 200;
+}
+
+function init(){
+	c = document.getElementById('one');
+	cc = c.getContext('2d');
+	w = document.body.clientWidth;
+	h = document.body.clientHeight;
+	c.width = w;
+	c.height = h;
+	cc.translate(w/2, h/2);
+	cc.save();
+	go();
+};
+
+function clearIt(f){
+	reset();
+	frist = 1;
+	cc.restore();
+	oldStyle = cc.fillStyle;
+	if(f){
+		cc.fillStyle = f;
+	}else{
+		cc.fillStyle = '#fff';
+	}
+	cc.fillRect(-w/2,-h/2,w,h);
+	cc.fillStyle = oldStyle;
+	cc.save();
+}
+
+function draw(x,y,f){
+	if(f){
+		cc.fillStyle = f;
+	}else{
+		cc.fillStyle = '#000';
+	}
+	if(frist){
+		cc.beginPath();
+		cc.moveTo(x,y);
+		frist = 0;
+	}else{
+		cc.lineTo(x,y);
+		cc.stroke();
+	}
+}
+
+function move(){
+	var x, y;
+	a1 += 10 * w1;
+	a1 %= 360;
+	a2 += 10 * w2;
+	a2 %= 360;
+	if(decay){
+		g1 *= 0.999;
+		g2 *= 0.999;
+	}
+	x = g1 * Math.sin(a1*degrees);
+	y = g2 * Math.cos((a2+ph)*degrees);
+	draw(x,y);
+	if(g1 < 5 && g2 < 5) stop();
+}
+
+function go(){
+	if(i) stop();
+	clearIt();
+	i = setInterval(move, 10);
+}
+
+function stop(){
+	if(i){
+		clearInterval(i);
+		i = 0;
+	}
+}
+
+</script>
+<style>
+body {
+	margin: 0;
+	padding: 0;
+}
+
+#UI {
+	border:solid thin;
+	width: 80%;
+	padding: 0.5em;
+	margin: 0.5em;
+	position: absolute;
+	z-index:1;
+}
+</style>
+</head>
+<body onload='init()'>
+<div id='UI'>
+<button onClick='go()'>Run</button>
+<button onClick='stop()'>Stop</button>
+<input onChange='(function(e){w1=e.target.value*1; console.log(w1)})(event)'
+type='number' id='w1' value='0.488' min='0.001' max='1' step='0.001'>Ratio</input>
+
+<input onChange='(function(e){ph=e.target.value*1; console.log(ph)})(event)'
+type='number' id='ph' value='90' min='-180' max='180'>Phase</input>
+
+<input type='checkbox' checked onChange='(function(e){if(e.target.checked){decay=1}else{decay=0}})(event)'>Decay</input>
+</div>
+<canvas id='one'></canvas>
+</body>
+</html>
