@@ -1,0 +1,89 @@
+<html>
+<head>
+<style>
+body {
+	margin:0;
+}
+#menu {
+	position: absolute;
+	z-index: 1;
+	left: 0;
+	top: 0;
+}
+</style>
+</head>
+<script>
+var degrees = Math.PI/180;
+var l, a, t, n;
+
+function init(){
+	l = 3;
+	a = 0;
+	n = 0;
+	t = 0;
+	c = document.createElement('canvas');
+	document.body.append(c);
+	w = document.body.clientWidth;
+	h = document.body.clientHeight;
+	c.width = w;
+	c.height = h;
+	cc = c.getContext('2d');
+	cc.translate(w/2, h/2);
+	cc.moveTo(0,0);
+	cc.beginPath();
+	cc.save();
+}
+
+function draw(){
+	if(!t){
+		t = setInterval(turtle, 1);
+	}
+}
+
+function reset(){
+	stop();
+	delete(cc);
+	c.outerHTML = "";
+	delete(c);
+	init();
+	draw();
+}
+
+function turtle(){
+	n++;
+	document.getElementById('odometer').innerHTML = n;
+	cc.lineTo(0,l);
+	cc.stroke();
+	cc.translate(0,l);
+	cc.rotate(a * degrees);
+//	l += 3;
+	a += (Math.floor(Math.random() * 7) - 3);
+	if (a < -25) a = 0;
+	if (a > 25) a = 0;
+}
+
+function home(){
+	cc.restore();
+	cc.moveTo(0,0);
+	cc.rotate(Math.random() * 360 * degrees);
+	cc.save();
+}
+
+function stop(){
+	if(t){
+		clearInterval(t);
+		t = 0;
+	}
+}
+</script>
+
+<body onload='init();draw()'>
+<div id='menu'>
+<button id='b1' onclick='stop()'>Stop</button>
+<button id='b3' onclick='draw()'>Go</button>
+<button id='b2' onclick='home()'>ReCenter</button>
+<button id='b4' onclick='reset()'>ReStart</button>
+<span id='odometer'></span>
+</div>
+</body>
+</html>
